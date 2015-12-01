@@ -85,4 +85,27 @@ app.get('/restaurant_id/:id', function(req,res) {
     });
 });
 
+app.get('/name/:name', function(req,res) {
+	var restaurantSchema = require('./models/restaurant');
+	mongoose.connect('mongodb://kathyso.cloudapp.net:27017/test');
+	var db = mongoose.connection;
+	db.on('error', console.error.bind(console, 'connection error:'));
+	db.once('open', function (callback) {
+		var Restaurant = mongoose.model('Restaurant', restaurantSchema);
+		Restaurant.find({name: req.params.name},function(err,results){
+       		if (err) {
+				res.status(500).json(err);
+				throw err
+			}
+			if (results.length > 0) {
+				res.status(200).json(results);
+			}
+			else {
+				res.status(200).json({message: 'No matching document'});
+			}
+			db.close();
+    	});
+    });
+});
+
 app.listen(process.env.PORT || 8099);
