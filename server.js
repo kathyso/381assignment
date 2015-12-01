@@ -43,14 +43,17 @@ app.post('/',function(req,res) {
     });
 });
 
-app.delete('/restaurant_id/:id',function(req,res) {
+app.delete('/:attrib/:attrib_value',function(req,res) {
+	var criteria = {};
+	criteria[req.params.attrib] = req.params.attrib_value;
+	
 	var restaurantSchema = require('./models/restaurant');
 	mongoose.connect('mongodb://kathyso.cloudapp.net:27017/test');
 	var db = mongoose.connection;
 	db.on('error', console.error.bind(console, 'connection error:'));
 	db.once('open', function (callback) {
 		var Restaurant = mongoose.model('Restaurant', restaurantSchema);
-		Restaurant.find({restaurant_id: req.params.id}).remove(function(err) {
+		Restaurant.find(criteria).remove(function(err) {
        		if (err) {
 				res.status(500).json(err);
 				throw err
