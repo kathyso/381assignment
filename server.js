@@ -72,7 +72,7 @@ app.get('/:attrib/:attrib_value', function(req,res) {
 	db.on('error', console.error.bind(console, 'connection error:'));
 	db.once('open', function (callback) {
 		var Restaurant = mongoose.model('Restaurant', restaurantSchema);
-		Restaurant.find({name: req.params.name},function(err,results){
+		Restaurant.find(criteria,function(err,results){
        		if (err) {
 				res.status(500).json(err);
 				throw err
