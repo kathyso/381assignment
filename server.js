@@ -65,6 +65,28 @@ app.delete('/:attrib/:attrib_value',function(req,res) {
     });
 });
 
+app.delete('/address/:attrib/:attrib_value',function(req,res) {
+	var criteria = {};
+	criteria["address."+req.params.attrib] = req.params.attrib_value;
+	
+	var restaurantSchema = require('./models/restaurant');
+	mongoose.connect('mongodb://kathyso.cloudapp.net:27017/test');
+	var db = mongoose.connection;
+	db.on('error', console.error.bind(console, 'connection error:'));
+	db.once('open', function (callback) {
+		var Restaurant = mongoose.model('Restaurant', restaurantSchema);
+		Restaurant.find(criteria).remove(function(err) {
+       		if (err) {
+				res.status(500).json(err);
+				throw err
+			}
+       		//console.log('Restaurant removed!')
+       		db.close();
+			res.status(200).json({message: 'delete done', id: req.params.id});
+    	});
+    });
+});
+
 app.get('/:attrib/:attrib_value', function(req,res) {
 	var criteria = {};
 	criteria[req.params.attrib] = req.params.attrib_value;
@@ -117,6 +139,29 @@ app.get('/address/:attrib/:attrib_value', function(req,res) {
     });
 });
 
+app.put('/:attrib/:attrib_value/grade', function(req,res) {
+	var criteria = {};
+	criteria[req.params.attrib] = req.params.attrib_value+".grade";
 
+	console.log(criteria);
+	
+	var restaurantSchema = require('./models/restaurant');
+	mongoose.connect('mongodb://kathyso.cloudapp.net:27017/test');
+	var db = mongoose.connection;
+	db.on('error', console.error.bind(console, 'connection error:'));
+	db.once('open', function (callback) {
+		var Restaurant = mongoose.model('Restaurant', restaurantSchema);
+		Kitten.update({req.params.name},{$set:criteria},function(err){
+			if (err) {
+				console.log("Error: " + err.message);
+				res.write(err.message);
+			}
+			else {
+				db.close();
+				res.status(200).json({message: 'update done'});
+			}
+		});
+	});
+});
 
 app.listen(process.env.PORT || 8099);
