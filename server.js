@@ -141,7 +141,7 @@ app.get('/address/:attrib/:attrib_value', function(req,res) {
 
 app.put('/:attrib/:attrib_value/grade', function(req,res) {
 	var criteria = {};
-	criteria[req.params.attrib] = req.params.attrib_value+".grade";
+	criteria[req.params.attrib] = req.params.attrib_value;
 
 	console.log(criteria);
 	
