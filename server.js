@@ -87,6 +87,28 @@ app.delete('/address/:attrib/:attrib_value',function(req,res) {
     });
 });
 
+app.delete('/grade/:attrib/:attrib_value',function(req,res) {
+	var criteria = {};
+	criteria["grades."+req.params.attrib] = req.params.attrib_value;
+	
+	var restaurantSchema = require('./models/restaurant');
+	mongoose.connect('mongodb://kathyso.cloudapp.net:27017/test');
+	var db = mongoose.connection;
+	db.on('error', console.error.bind(console, 'connection error:'));
+	db.once('open', function (callback) {
+		var Restaurant = mongoose.model('Restaurant', restaurantSchema);
+		Restaurant.find(criteria).remove(function(err) {
+       		if (err) {
+				res.status(500).json(err);
+				throw err
+			}
+       		//console.log('Restaurant removed!')
+       		db.close();
+			res.status(200).json({message: 'delete done', id: req.params.id});
+    	});
+    });
+});
+
 app.get('/:attrib/:attrib_value', function(req,res) {
 	var criteria = {};
 	criteria[req.params.attrib] = req.params.attrib_value;
@@ -139,6 +161,57 @@ app.get('/address/:attrib/:attrib_value', function(req,res) {
     });
 });
 
+app.get('/grade/:attrib/:attrib_value', function(req,res) {
+	var criteria = {};
+	criteria["grades."+req.params.attrib] = req.params.attrib_value;
+	
+	var restaurantSchema = require('./models/restaurant');
+	mongoose.connect('mongodb://kathyso.cloudapp.net:27017/test');
+	var db = mongoose.connection;
+	db.on('error', console.error.bind(console, 'connection error:'));
+	db.once('open', function (callback) {
+		var Restaurant = mongoose.model('Restaurant', restaurantSchema);
+		Restaurant.find(criteria,function(err,results){
+       		if (err) {
+				res.status(500).json(err);
+				throw err
+			}
+			if (results.length > 0) {
+				res.status(200).json(results);
+			}
+			else {
+				res.status(200).json({message: 'No matching document'});
+			}
+			db.close();
+    	});
+    });
+});
+
+app.put('/:attrib/:attrib_value', function(req,res) {
+	var criteria = {};
+	criteria[req.params.attrib] = req.params.attrib_value;
+
+	console.log(criteria);
+	
+	var restaurantSchema = require('./models/restaurant');
+	mongoose.connect('mongodb://kathyso.cloudapp.net:27017/test');
+	var db = mongoose.connection;
+	db.on('error', console.error.bind(console, 'connection error:'));
+	db.once('open', function (callback) {
+		var Restaurant = mongoose.model('Restaurant', restaurantSchema);
+		Restaurant.update(criteria,{$set:req.body},function(err){
+			if (err) {
+				console.log("Error: " + err.message);
+				res.write(err.message);
+			}
+			else {
+				res.status(200).json({message: 'update done'});
+			}
+			db.close();
+		});
+	});
+});
+
 app.put('/:attrib/:attrib_value/grade', function(req,res) {
 	var criteria = {};
 	criteria[req.params.attrib] = req.params.attrib_value;
@@ -155,6 +228,39 @@ app.put('/:attrib/:attrib_value/grade', function(req,res) {
 		rObj.grades.date = req.body.date;
 		rObj.grades.grade = req.body.grade;
 		rObj.grades.score = req.body.score;
+		var Restaurant = mongoose.model('Restaurant', restaurantSchema);
+		Restaurant.update(criteria,{$set:rObj},function(err){
+			if (err) {
+				console.log("Error: " + err.message);
+				res.write(err.message);
+			}
+			else {
+				res.status(200).json({message: 'update done'});
+			}
+			db.close();
+		});
+	});
+});
+
+app.put('/:attrib/:attrib_value/address', function(req,res) {
+	var criteria = {};
+	criteria[req.params.attrib] = req.params.attrib_value;
+
+	console.log(criteria);
+	
+	var restaurantSchema = require('./models/restaurant');
+	mongoose.connect('mongodb://kathyso.cloudapp.net:27017/test');
+	var db = mongoose.connection;
+	db.on('error', console.error.bind(console, 'connection error:'));
+	db.once('open', function (callback) {
+		var rObj = {};
+		rObj.address = {};
+		rObj.address.building = req.body.building;
+		rObj.address.street = req.body.street;
+		rObj.address.zipcode = req.body.zipcode;
+		rObj.address.coord = [];
+		rObj.address.coord.push(req.body.lon);
+		rObj.address.coord.push(req.body.lat);
 		var Restaurant = mongoose.model('Restaurant', restaurantSchema);
 		Restaurant.update(criteria,{$set:rObj},function(err){
 			if (err) {
