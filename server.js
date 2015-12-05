@@ -43,6 +43,27 @@ app.post('/',function(req,res) {
     });
 });
 
+app.delete('/deleteall',function(req,res) {
+	var criteria = {};
+	
+	var restaurantSchema = require('./models/restaurant');
+	mongoose.connect('mongodb://kathyso.cloudapp.net:27017/test');
+	var db = mongoose.connection;
+	db.on('error', console.error.bind(console, 'connection error:'));
+	db.once('open', function (callback) {
+		var Restaurant = mongoose.model('Restaurant', restaurantSchema);
+		Restaurant.remove(function(err) {
+       		if (err) {
+				res.status(500).json(err);
+				throw err
+			}
+       		//console.log('Restaurant removed!')
+       		db.close();
+			res.status(200).json({message: 'delete done', id: req.params.id});
+    	});
+    });
+});
+
 app.delete('/:attrib/:attrib_value',function(req,res) {
 	var criteria = {};
 	criteria[req.params.attrib] = req.params.attrib_value;
@@ -107,6 +128,29 @@ app.delete('/grade/:attrib/:attrib_value',function(req,res) {
 			res.status(200).json({message: 'delete done', id: req.params.id});
     	});
     });
+});
+
+app.get('/', function(req, res, next) {
+	var restaurantSchema = require('./models/restaurant');
+	mongoose.connect('mongodb://kathyso.cloudapp.net:27017/test');
+	var db = mongoose.connection;
+	db.on('error', console.error.bind(console, 'connection error:'));
+	db.once('open', function (callback) {
+		var Restaurant = mongoose.model('Restaurant', restaurantSchema);
+  		Restaurant.find(function (err, results) {
+    			if (err) {
+				res.status(500).json(err);
+				throw err
+			}
+			if (results.length > 0) {
+				res.status(200).json(results);
+			}
+			else {
+				res.status(200).json({message: 'No matching document'});
+			}
+			db.close();
+  		});
+	});
 });
 
 app.get('/:attrib/:attrib_value', function(req,res) {
