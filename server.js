@@ -23,10 +23,6 @@ app.post('/',function(req,res) {
 		rObj.address.coord = [];
 		rObj.address.coord.push(req.body.lon);
 		rObj.address.coord.push(req.body.lat);
-		rObj.grades = [{}];
-		rObj.grades.date = req.body.date;
-		rObj.grades.grade = req.body.grade;
-		rObj.grades.score = req.body.score;
 		rObj.borough = req.body.borough;
 		rObj.cuisine = req.body.cuisine;
 		rObj.name = req.body.name;
@@ -143,6 +139,34 @@ app.get('/address/:attrib/:attrib_value', function(req,res) {
     });
 });
 
+app.put('/:attrib/:attrib_value/grade', function(req,res) {
+	var criteria = {};
+	criteria[req.params.attrib] = req.params.attrib_value;
 
+	console.log(criteria);
+	
+	var restaurantSchema = require('./models/restaurant');
+	mongoose.connect('mongodb://kathyso.cloudapp.net:27017/test');
+	var db = mongoose.connection;
+	db.on('error', console.error.bind(console, 'connection error:'));
+	db.once('open', function (callback) {
+		var rObj = {};
+		rObj.grades = {};
+		rObj.grades.date = req.body.date;
+		rObj.grades.grade = req.body.grade;
+		rObj.grades.score = req.body.score;
+		var Restaurant = mongoose.model('Restaurant', restaurantSchema);
+		Restaurant.update(criteria,{$set:rObj},function(err){
+			if (err) {
+				console.log("Error: " + err.message);
+				res.write(err.message);
+			}
+			else {
+				res.status(200).json({message: 'update done'});
+			}
+			db.close();
+		});
+	});
+});
 
 app.listen(process.env.PORT || 8099);
