@@ -129,7 +129,7 @@ app.delete('/grade/:attrib/:attrib_value',function(req,res) {
     	});
     });
 });
-//test
+
 app.get('/', function(req, res, next) {
 	var restaurantSchema = require('./models/restaurant');
 	mongoose.connect('mongodb://kathyso.cloudapp.net:27017/test');
