@@ -112,7 +112,7 @@ app.delete('/address/:attrib/:attrib_value',function(req,res) {
 
 app.delete('/grade/:attrib/:attrib_value',function(req,res) {
 	var criteria = {};
-	criteria["grades."+req.params.attrib] = req.params.attrib_value;
+	criteria[req.params.attrib] = req.params.attrib_value;
 	
 	var restaurantSchema = require('./models/restaurant');
 	mongoose.connect('mongodb://kathyso.cloudapp.net:27017/test');
